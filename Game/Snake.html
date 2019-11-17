@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Snake</title>
+	</head>
+	<body>
+	<button style="width:100%;font-size: 10em;" onclick="exec()">Start!</button>
+	</body>
+	<script type="text/javascript">
+		"use strict";
+		var snake = {
+			score: 0,
+			timer: null,
+			table: null,
+			thead: null,
+			tbody: null,
+			tbodyTable: null,
+			map: null,
+			inputArr: null,
+			isInitialization: false,
+			hasAddResizeListener: false,
+			fruitStyle: "background-color:yellow;transition:all 0.25s linear 0s",
+			snakeStyle: "background-color:green;transition:all 0.25s linear 0s",
+			snakeHeadStyle: "background-color:blue;transition:all 0.25s linear 0s",
+			snakeTailStyle: "background-color:red;transition:all 0.25s linear 0s",
+			nullStyle: "background-color:white;transition:all 0.25s linear 0s",
+			blockStyle: "background-color:grey;transition:all 0.25s linear 0s",
+			snake: null,
+			fruit: null,
+			direction: 0,
+			doDirectionFunc: null,
+			snakeY: -1,
+			snakeX: -1,
+			isPlay: false,
+			isAI: false,
+			hasCalcAI: false,
+			initialization: function(element) {
+
+				if (this.isInitialization) {
+					alert("Game has been initialized!");
+					return;
+				}
+
+				var row = 10;
+				var column = 10;
+				var speed = 1000;
+
+				var table = document.createElement('table');
+
+				table.setAttribute('border', 1);
+				table.setAttribute('width', '100%');
+				table.setAttribute('height', '100%');
+
+				this.table = table;
+
+				var buildThead = function() {
+					var thead = document.createElement('thead');
+					var theadTh = document.createElement('th');
+					var theadThTr = document.createElement('tr');
+					theadTh.setAttribute('align', 'center');
+					var title = document.createElement('h1');
+					title.innerText = 'Snake';
+
+
+					var theadTd0Arr = new Array();
+					var theadTr = document.createElement('tr');
+					theadTr.setAttribute('align', 'center');
+
+					//
+					var Td00 = document.createElement('label');
+					Td00.innerText = 'Row:';
+
+					var Td01 = document.createElement('input');
+					Td01.setAttribute('name', 'row');
+					Td01.setAttribute('type', 'number');
+
+					var theadTd01 = document.createElement('td');
+					theadTd01.appendChild(Td00);
+					theadTd01.appendChild(Td01);
+					theadTd0Arr.push(theadTd01);
+					//
+					//
+					var Td02 = document.createElement('label');
+					Td02.innerText = 'Column:';
+
+
+					var theadTd03 = document.createElement('td');
+					var Td03 = document.createElement('input');
+					Td03.setAttribute('name', 'column');
+					Td03.setAttribute('type', 'number');
+
+					theadTd03.appendChild(Td02);
+					theadTd03.appendChild(Td03);
+					theadTd0Arr.push(theadTd03);
+					//		
+					//
+					var Td09 = document.createElement('label');
+					Td09.innerText = 'Speed:';
+
+
+					var theadTd10 = document.createElement('td');
+					var Td10 = document.createElement('input');
+					Td10.setAttribute('name', 'speed');
+					Td10.setAttribute('type', 'number');
+
+
+					theadTd10.appendChild(Td09);
+					theadTd10.appendChild(Td10);
+					theadTd0Arr.push(theadTd10);
+					//				
+					//
+					var Td04 = document.createElement('label');
+					Td04.innerText = 'Message:';
+
+
+					var theadTd05 = document.createElement('td');
+					var Td05 = document.createElement('input');
+					Td05.setAttribute('name', 'message');
+					Td05.setAttribute('type', 'text');
+					Td05.setAttribute('disabled', true);
+
+
+					theadTd05.appendChild(Td04);
+					theadTd05.appendChild(Td05);
+					theadTd0Arr.push(theadTd05);
+					//		
+					//
+					var Td06 = document.createElement('input');
+					Td06.setAttribute('type', 'checkbox');
+					Td06.setAttribute('name', 'ai');
+
+
+
+
+					var theadTd07 = document.createElement('td');
+					var Td07 = document.createElement('label');
+					Td07.innerText = 'AI';
+
+					theadTd07.appendChild(Td06);
+					theadTd07.appendChild(Td07);
+					theadTd0Arr.push(theadTd07);
+					//		
+
+					//		
+					//
+
+
+					var theadTd08 = document.createElement('td');
+					var Td08 = document.createElement('input');
+					Td08.setAttribute('type', 'button');
+					Td08.setAttribute('value', 'Start');
+					Td08.setAttribute('name', 'play');
+
+					theadTd08.appendChild(Td08);
+					theadTd0Arr.push(theadTd08);
+					//		
+
+
+					theadTh.setAttribute('colspan', theadTd0Arr.length);
+					theadTh.appendChild(title);
+
+					for (var i = 0; i < theadTd0Arr.length; i++) {
+						theadTr.appendChild(theadTd0Arr[i]);
+					}
+
+					theadThTr.appendChild(theadTh);
+					thead.appendChild(theadThTr);
+					thead.appendChild(theadTr);
+					return thead;
+				}
+				this.thead = buildThead();
+				table.appendChild(this.thead);
+				this.inputArr = table.getElementsByTagName('input');
+
+
+
+
+
+
+
+
+
+
+
+				var tbody = document.createElement('tbody');
+				this.tbody = tbody;
+				var tbodyTR = document.createElement('tr');
+				var tbodyTRTD = document.createElement('td');
+				tbodyTRTD.setAttribute('colspan', this.thead.getElementsByTagName('th')[0].getAttribute('colspan'));
+				tbodyTRTD.setAttribute('width', '100%');
+				tbodyTRTD.setAttribute('height', '100%');
+				this.addButton();
+				var tbodyTable = document.createElement('table');
+				this.tbodyTable = tbodyTable;
+
+				tbodyTRTD.appendChild(tbodyTable);
+				tbodyTR.appendChild(tbodyTRTD);
+				tbody.appendChild(tbodyTR);
+
+
+				for (var i = 0; i < this.inputArr.length; i++) {
+					var name = this.inputArr[i].getAttribute('name');
+
+					switch (name) {
+						case 'row':
+							this.inputArr[i].setAttribute('min', 2);
+							this.inputArr[i].setAttribute('value', row);
+							this.inputArr[i].addEventListener('change', function(e) {
+								this.setAttribute('value', this.value)
+							});
+							break;
+						case 'column':
+							this.inputArr[i].setAttribute('min', 2);
+							this.inputArr[i].setAttribute('value', column);
+							this.inputArr[i].addEventListener('change', function(e) {
+								this.setAttribute('value', this.value)
+							});
+							break;
+						case 'speed':
+							this.inputArr[i].setAttribute('min', 1);
+							this.inputArr[i].setAttribute('value', speed);
+							this.inputArr[i].addEventListener('change', function(e) {
+								this.setAttribute('value', this.value)
+							});
+							break;
+						case 'message':
+							this.inputArr[i].setAttribute('value', 'Welcome!');
+							this.inputArr[i].addEventListener('change', function(e) {
+								this.setAttribute('value', this.value)
+							});
+							break;
+						case 'ai':
+							this.inputArr[i].addEventListener('change', function(e) {
+								if (objData.isAI) {
+
+									objData.isAI = false;
+								} else {
+									objData.isAI = true;
+								}
+								//console.log(objData.isAI);
+							});
+							break;
+						case 'play':
+							var objData = this;
+							this.inputArr[i].addEventListener('click', function(e) {
+								objData.play();
+							});
+							break;
+						default:
+							break;
+
+					}
+
+
+				}
+
+				var tfoot = document.createElement('tfoot');
+
+
+
+
+
+				table.appendChild(tbody);
+				table.appendChild(tfoot);
+
+
+				element.appendChild(table);
+
+				this.isInitialization = true;
+
+			},
+			setStyle: function(objData) {
+
+				objData.tbodyTable.setAttribute('border', 1);
+				objData.tbodyTable.setAttribute('width', '100%');
+				objData.tbodyTable.setAttribute('height', '100%');
+				var row = objData.getDataFromInput('row');
+				var column = objData.getDataFromInput('column');
+				//console.log(eval(objData.map));
+				for (var y = 0; y < row; y++) {
+
+					for (var x = 0; x < column; x++) {
+						var td = objData.map[y][x];
+						td.setAttribute('width', 100.0 / column + '%');
+						//console.log(td.clientWidth);
+						td.setAttribute('height', td.clientWidth + 'px');
+					}
+				}
+
+			},
+			doNext: function(objData) {
+				//console.log('Next!');
+				var snakeNextX = objData.snakeX;
+				var snakeNextY = objData.snakeY;
+
+				if (objData.isAI) {
+					objData.doAI();
+				}
+
+				switch (objData.direction) {
+					case 0:
+						//Down
+						snakeNextY++;
+						break;
+					case 1:
+						//Left
+						snakeNextX--;
+						break;
+					case 2:
+						//Up
+						snakeNextY--;
+						break;
+					case 3:
+						//Right
+						snakeNextX++;
+						break;
+					default:
+						break;
+				}
+				//console.log('Check Map!');
+				if (objData.isOverMap(snakeNextX, snakeNextY, objData.getDataFromInput('row'), objData.getDataFromInput('column'))) {
+					objData.faild();
+					return;
+				}
+				var nextCell = objData.map[snakeNextY][snakeNextX];
+				//console.log('Check Body!');
+				if (objData.isSnake(nextCell)) {
+					objData.faild();
+					return;
+				}
+
+				var currentCell = this.snake[0];
+				//console.log(eval(objData.snake));
+				currentCell.style = objData.snakeStyle;
+				if (objData.isFruit(nextCell)) {
+					//console.log('Not Fruit!');
+
+					objData.score++;
+					objData.getObjectFromInput('message').setAttribute('value', 'Score:' + objData.score);
+					objData.createFruit();
+				} else {
+
+					var lastCell = objData.snake.pop();
+					lastCell.style = objData.nullStyle;
+
+				}
+				objData.snake.unshift(nextCell);
+				nextCell.style = objData.snakeHeadStyle;
+				objData.snakeX = snakeNextX;
+				objData.snakeY = snakeNextY;
+				if(objData.snake.length>1){
+					objData.snake[objData.snake.length-1].style = objData.snakeTailStyle;
+				}
+
+			},
+			isOverMap: function(x, y, row, column) {
+				if ((x >= 0 && x < column) && (y >= 0 && y < row)) {
+					return false;
+					//console.log('pass!');
+				} else {
+					//console.log('faild!');
+					return true;
+				}
+
+
+			},
+			setDataStyle: function(objData) {
+
+			},
+			addButton: function() {
+				var objData = this;
+
+				var tr = document.createElement('tr');
+				var th = document.createElement('th');
+				th.setAttribute('colspan', this.thead.getElementsByTagName('th')[0].getAttribute('colspan'));
+				tr.appendChild(th);
+				var up = document.createElement('input');
+				up.setAttribute('value', '↑');
+				up.setAttribute('type', 'button');
+				up.style = "width:25%";
+				up.addEventListener('click', function(e) {
+					//console.log(eval(e));
+					objData.doDirection({
+						keyCode: 38
+					}, objData);
+
+				});
+
+
+				var down = document.createElement('input');
+				down.setAttribute('value', '↓');
+				down.setAttribute('type', 'button');
+				down.style = "width:25%";
+				down.addEventListener('click', function(e) {
+					//console.log(eval(e));
+					objData.doDirection({
+						keyCode: 40
+					}, objData);
+
+				});
+				var left = document.createElement('input');
+				left.setAttribute('value', '←');
+				left.setAttribute('type', 'button');
+				left.style = "width:25%";
+				left.addEventListener('click', function(e) {
+					//console.log(eval(e));
+					objData.doDirection({
+						keyCode: 37
+					}, objData);
+
+				});
+				var right = document.createElement('input');
+				right.setAttribute('value', '→');
+				right.setAttribute('type', 'button');
+				right.style = "width:25%";
+				right.addEventListener('click', function(e) {
+					//console.log(eval(e));
+					objData.doDirection({
+						keyCode: 39
+					}, objData);
+
+				});
+
+				th.appendChild(up);
+				th.appendChild(down);
+				th.appendChild(left);
+				th.appendChild(right);
+
+
+				tr.appendChild(th);
+				this.tbody.appendChild(tr);
+			},
+			build: function() {
+				//console.log("Build!");
+
+				this.tbodyTable.innerHTML = "";
+				this.map = new Array();
+				var row = this.getDataFromInput('row');
+				var column = this.getDataFromInput('column');
+				//var parentWidth = this.tbodyTable.clientWidth;
+				//console.log(parentWidth);
+				this.map = new Array();
+				for (var y = 0; y < row; y++) {
+					this.map[y] = new Array();
+					var tr = document.createElement('tr');
+
+
+					for (var x = 0; x < column; x++) {
+						var td = document.createElement('td');
+						//td.setAttribute('width',100.0/column+'%');
+
+						//td.setAttribute('height',parentWidth/row+'px');
+						//td.setAttribute('height',100.0/row+'%');
+						this.map[y][x] = td;
+						tr.appendChild(td);
+						td.style = this.nullStyle;
+					}
+
+					this.tbodyTable.appendChild(tr);
+
+
+
+
+				}
+				var objData = this;
+				this.setStyle(objData);
+
+
+				if (!this.hasAddResizeListener) {
+					var func = function(e) {
+						objData.setStyle(objData);
+					};
+					window.addEventListener('resize', func);
+					this.hasAddResizeListener = true;
+				}
+				this.createSnake();
+				this.createFruit();
+				this.doDirectionFunc = function(e) {
+					//console.log(eval(e));
+					objData.doDirection(e, objData);
+
+				}
+
+				document.addEventListener('keyup', this.doDirectionFunc);
+				this.getObjectFromInput('message').setAttribute('value', 'Score:' + objData.score);
+				this.timer = setInterval(function() {
+					objData.doNext(objData)
+				}, this.getDataFromInput('speed'));
+
+			},
+			faild: function() {
+				//console.log('faild!');
+				this.stop();
+				var button = this.getObjectFromInput('play');
+				button.setAttribute('value', 'Replay?');
+			},
+			stop: function() {
+				clearInterval(this.timer);
+				this.score = 0;
+				document.removeEventListener('keyup', this.doDirectionFunc);
+				this.doDirectionFunc = null;
+				this.setNullCellStyle(this.blockStyle);
+
+
+			},
+			createFruit: function() {
+				var randomY = Math.ceil(Math.random() * this.getDataFromInput('row'));
+				var randomX = Math.ceil(Math.random() * this.getDataFromInput('column'));
+
+				var cell = this.map[randomY - 1][randomX - 1];
+				if (!this.isSnake(cell)) {
+
+					this.fruit = cell;
+					this.fruit.style = this.fruitStyle;
+
+				} else {
+					this.createFruit();
+				}
+
+
+
+			},
+			createSnake: function() {
+				var Y = this.getDataFromInput('row') / 2 - 1;
+				var X = this.getDataFromInput('column') / 2 - 1;
+				this.snake = new Array();
+				var cell = this.map[Y][X];
+				this.snakeX = X;
+				this.snakeY = Y;
+				cell.style = this.snakeHeadStyle;
+				this.snake.unshift(cell);
+
+
+			},
+			setNullCellStyle: function(style) {
+
+				for (var y = 0; y < this.map.length; y++) {
+					for (var x = 0; x < this.map[y].length; x++) {
+						var cell = this.map[y][x];
+						if (!this.isFruit(cell) && !this.isSnake(cell)) {
+							cell.style = style;
+						}
+					}
+				}
+
+
+			},
+			isFruit: function(cell) {
+				if (cell === this.fruit) {
+					return true;
+				} else {
+					return false;
+				}
+			},
+			isSnakeHead: function(cell) {
+				//console.log(cell);
+
+
+				if (cell === this.snake[0]) {
+					return true;
+				}
+
+
+
+				return false;
+
+			},
+			isSnakeTail: function(cell) {
+				//console.log(cell);
+
+
+				if (cell === this.snake[this.snake.length - 1]) {
+					return true;
+				}
+
+
+
+				return false;
+
+			},
+			isSnake: function(cell) {
+				//console.log(cell);
+
+				for (var i = 0; i < this.snake.length; i++) {
+
+					if (cell === this.snake[i]) {
+						return true;
+					}
+
+				}
+
+				return false;
+
+			},
+			play: function() {
+				var button = this.getObjectFromInput('play');
+				if (!this.isPlay) {
+					this.build();
+					this.doLock(true);
+					button.value = "Stop";
+					this.isPlay = true;
+				} else {
+					this.stop();
+					//this.tbody.innerHTML="";
+					this.doLock(false);
+					button.value = "Start";
+					this.isPlay = false;
+				}
+
+			},
+			doLock: function(flag) {
+
+				if (flag) {
+					this.getObjectFromInput('row').setAttribute('readonly', flag);
+					this.getObjectFromInput('column').setAttribute('readonly', flag);
+					this.getObjectFromInput('speed').setAttribute('readonly', flag);
+				} else {
+					this.getObjectFromInput('row').removeAttribute('readonly');
+					this.getObjectFromInput('column').removeAttribute('readonly');
+					this.getObjectFromInput('speed').removeAttribute('readonly');
+
+
+				}
+
+
+			},
+			doAI: function() {
+				var objData = this;
+				var searchList = new Array();
+				var resultList = new Array();
+				var mapAI = this.getMapDataForAI();
+				var mapRoadInf;
+				mapRoadInf = new Array();
+				for (var y = 0; y < this.getDataFromInput('row'); y++) {
+
+					mapRoadInf[y] = new Array();
+					for (var x = 0; x < this.getDataFromInput('column'); x++) {
+						mapRoadInf[y][x] = -1;
+					}
+
+				};
+				//console.log(mapRoadInf);
+				var snakeHeadX = this.getMapTargetX(mapAI, 1);
+				var snakeHeadY = this.getMapTargetY(mapAI, 1);
+				var snakeTailX = this.getMapTargetX(mapAI, 3);
+				var snakeTailY = this.getMapTargetY(mapAI, 3);
+				var snakeFruitX = this.getMapTargetX(mapAI, -1);
+				var snakeFruitY = this.getMapTargetY(mapAI, -1);
+				var isVaildRoad = function(cell) {
+					if (cell.y < 0 || cell.y >= objData.getDataFromInput('row')) {
+						return false;
+					}
+					if (cell.x < 0 || cell.x >= objData.getDataFromInput('column')) {
+						return false;
+					}
+					//console.log("Y:"+cell.y+"X:"+cell.x+"|"+mapAI[cell.y][cell.x]);
+					if (mapAI[cell.y][cell.x] > 0) {
+						return false;
+					}
+					if (mapRoadInf[cell.y][cell.x] != -1) {
+						//console.log("Faild:Y:"+cell.y+"X:"+cell.x+"|"+mapRoadInf[cell.y][cell.x]);
+						return false;
+					} else {
+						//console.log("Pass:Y:"+cell.y+"X:"+cell.x+"|"+mapRoadInf[cell.y][cell.x]);
+					}
+					return true;
+
+				}
+				//console.log(mapAI);
+
+				var calcRange = function(target, depth) {
+					//console.log(mapRoadInf.toString());
+					var nextSearchList = new Array();
+					//console.log(depth);
+					while (searchList.length > 0) {
+						var cell = searchList.shift();
+						mapRoadInf[cell.y][cell.x] = depth;
+						if (cell.y == target.y && cell.x == target.x) {
+							return;
+						}
+
+						//Down
+						var downCell = {
+							x: cell.x,
+							y: cell.y + 1
+						};
+						if (isVaildRoad(downCell)) {
+							nextSearchList.push(downCell);
+						}
+						//Left
+						var leftCell = {
+							x: cell.x - 1,
+							y: cell.y
+						};
+						if (isVaildRoad(leftCell)) {
+							nextSearchList.push(leftCell);
+						}
+						//Up
+						var upCell = {
+							x: cell.x,
+							y: cell.y - 1
+						};
+						if (isVaildRoad(upCell)) {
+							nextSearchList.push(upCell);
+						}
+						//Right
+						var rightCell = {
+							x: cell.x + 1,
+							y: cell.y
+						};
+						if (isVaildRoad(rightCell)) {
+							nextSearchList.push(rightCell);
+						}
+
+					}
+
+
+
+					searchList = nextSearchList;
+					calcRange(target, depth + 1);
+
+				};
+				searchList.push({
+					x: snakeHeadX,
+					y: snakeHeadY
+				});
+				calcRange({
+					x: snakeFruitX,
+					y: snakeFruitY
+				}, 0);
+				//console.log(mapRoadInf);
+				var findRoad = function(source, target) {
+					var road = new Array();
+					var mapRoadVisited = new Array();
+					for (var y = 0; y < objData.getDataFromInput('row'); y++) {
+
+						mapRoadVisited[y] = new Array();
+						for (var x = 0; x < objData.getDataFromInput('column'); x++) {
+							mapRoadVisited[y][x] = false;
+						}
+
+					};
+
+					var isVaildNextRoad = function(cell) {
+						if (cell.y < 0 || cell.y >= objData.getDataFromInput('row')) {
+							return false;
+						}
+						if (cell.x < 0 || cell.x >= objData.getDataFromInput('column')) {
+							return false;
+						}
+						//console.log("Y:"+cell.y+"X:"+cell.x+"|"+mapAI[cell.y][cell.x]);
+						if (mapAI[cell.y][cell.x] > 0) {
+							return false;
+						}
+						return true;
+
+					}
+
+
+					var hasFind = false;
+					var next = function(cell, target) {
+						if (!hasFind) {
+							resultList.push(cell);
+						}
+						if (cell.x == target.x && cell.y == target.y) {
+							hasFind = true;
+							// for (var i = 0; i < resultList.length; i++) {
+							// 	console.log(resultList[i]);
+							// }
+							return;
+						}
+
+
+						//Down
+						var downCell = {
+							x: cell.x,
+							y: cell.y + 1
+						};
+						if (!hasFind && isVaildNextRoad(downCell) && !mapRoadVisited[downCell.y][downCell.x] && mapRoadInf[downCell.y]
+							[downCell.x] ==
+							mapRoadInf[cell.y][cell.x] + 1) {
+
+							next(downCell, target);
+						}
+						//Left
+						var leftCell = {
+							x: cell.x - 1,
+							y: cell.y
+						};
+						if (!hasFind && isVaildNextRoad(leftCell) && !mapRoadVisited[leftCell.y][leftCell.x] && mapRoadInf[leftCell.y]
+							[leftCell.x] ==
+							mapRoadInf[cell.y][cell.x] + 1) {
+							next(leftCell, target);
+						}
+						//Up
+						var upCell = {
+							x: cell.x,
+							y: cell.y - 1
+						};
+						if (!hasFind && isVaildNextRoad(upCell) && !mapRoadVisited[upCell.y][upCell.x] && mapRoadInf[upCell.y][upCell
+								.x
+							] ==
+							mapRoadInf[cell.y][cell.x] + 1) {
+							next(upCell, target);
+						}
+						//Right
+						var rightCell = {
+							x: cell.x + 1,
+							y: cell.y
+						};
+						if (!hasFind && isVaildNextRoad(rightCell) && !mapRoadVisited[rightCell.y][rightCell.x] && mapRoadInf[
+								rightCell.y][
+								rightCell.x
+							] ==
+							mapRoadInf[cell.y][cell.x] + 1) {
+							next(rightCell, target);
+						}
+						if (!hasFind) {
+							mapRoadVisited[cell.y][cell.x] = true;
+							resultList.pop();
+						}
+					}
+
+					next(source, target);
+
+
+
+
+				}
+				findRoad({
+					x: snakeHeadX,
+					y: snakeHeadY
+				}, {
+					x: snakeFruitX,
+					y: snakeFruitY
+				});
+
+
+				if (resultList.length >= 1) {
+
+					var nextCell = resultList[1];
+
+					var offsetX = snakeHeadX - nextCell.x;
+					var offsetY = snakeHeadY - nextCell.y;
+					// console.log("SX:"+snakeHeadX);
+					// console.log("SY:"+snakeHeadY);
+					// console.log(nextCell);
+					// console.log(offsetX);
+					// console.log(offsetY);
+					if (offsetX < 0) {
+						objData.direction = 3;
+					} else
+					if (offsetX > 0) {
+						objData.direction = 1;
+					} else
+					if (offsetY < 0) {
+						objData.direction = 0;
+					} else
+					if (offsetY > 0) {
+						objData.direction = 2;
+					}
+
+				}
+
+
+
+
+
+			},
+			getMapTargetX: function(map, data) {
+				for (var y = 0; y < map.length; y++) {
+					for (var x = 0; x < map[y].length; x++) {
+						if (map[y][x] == data) {
+							return x;
+						}
+
+					}
+				}
+				return -1;
+			},
+			getMapTargetY: function(map, data) {
+
+				for (var y = 0; y < map.length; y++) {
+					for (var x = 0; x < map[y].length; x++) {
+						if (map[y][x] == data) {
+							return y;
+						}
+
+					}
+				}
+				return -1;
+
+			},
+			getMapDataForAI: function() {
+				var arr = new Array();
+				for (var y = 0; y < this.map.length; y++) {
+					arr[y] = new Array();
+					for (var x = 0; x < this.map[y].length; x++) {
+						var cell = this.map[y][x];
+						if (this.isSnakeHead(cell)) {
+							arr[y][x] = 1;
+							continue;
+						}
+						if (this.isSnakeTail(cell)) {
+							arr[y][x] = 3;
+							continue;
+						}
+						if (this.isSnake(cell)) {
+							arr[y][x] = 2;
+							continue;
+						}
+						if (this.isFruit(cell)) {
+							arr[y][x] = -1;
+							continue;
+						}
+						arr[y][x] = 0;
+
+
+					}
+				}
+
+				return arr;
+
+			},
+			doDirection: function(e, objData) {
+				//console.log(e);
+				if (objData.isAI) {
+					return;
+				}
+				switch (e.keyCode) {
+					case 37:
+						//Left
+						objData.direction = 1;
+						break;
+					case 38:
+						//Up
+						objData.direction = 2;
+						break;
+					case 39:
+						//Right
+						objData.direction = 3;
+						break;
+					case 40:
+						//Down
+						objData.direction = 0;
+						break;
+					default:
+						break;
+				}
+
+
+			},
+			getDataFromInput: function(name) {
+
+				return this.getObjectFromInput(name).getAttribute('value');
+
+			},
+			getObjectFromInput: function(name) {
+
+				for (var i = 0; i < this.inputArr.length; i++) {
+					if (name == this.inputArr[i].getAttribute('name')) {
+						return this.inputArr[i];
+					}
+				}
+				//console.error('No Input Data:' + name);
+				return -1;
+
+			}
+
+		}
+
+		//document.getElementsByTagName('body')[0].style.height = window.innerHeight+'px';  
+		function exec() {
+			document.body.innerHTML="";
+			snake.initialization(document.body);
+		}
+	</script>
+</html>
